@@ -4,6 +4,7 @@ import { debouncedWatch } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import api from '@/api'
 import { useAppStore } from '@/store'
+import UModal from '@/components/ui/UModal.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -16,34 +17,21 @@ const searchFlag = computed({
 // 搜索关键字
 const keyword = ref('')
 
-// 防抖 watch, 节流: throttledWatch
-debouncedWatch(
-    keyword,
-    () => {
-      if (keyword.value) {
-        handleSearch()
-      }
-    },
-    { debounce: 300 },
-)
+function handleEnterKey(event) {
+  if (event.key === 'Enter') {
+    searchFlag.value=false
+    handleSearch();
+  }
+}
 
 async function handleSearch() {
-  // const resp = await api.searchArticles({ keyword: keyword.value })
+  const resp = await api.searchArticles({ keyword: keyword.value })
   // 跳转到搜索结果页面，并传递搜索结果
-  const resp = [
-    {
-      id: 1,
-      imageUrl: 'https://via.placeholder.com/250x200?text=Product1',
-      name: 'Product 1',
-      description: 'This is the first product',
-      price: 99.99,
-    },
-  ]
   router.push({
     path: '/search-results',
     query: {
       keyword: keyword.value,
-      results: JSON.stringify(resp.data),
+      results: JSON.stringify(resp),
     },
   })
 }
@@ -62,9 +50,10 @@ async function handleSearch() {
           </div>
           <input
               v-model="keyword"
-              class="block w-full border-0 rounded-full py-2 pl-8 pr-5 text-gray-900 outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-green-300"
-              placeholder="输入文章标题或内容..."
-          >
+              class="block w-full max-w-md border-0 rounded-full py-2 pl-8 pr-5 text-gray-900 outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-green-300"
+              placeholder="输入产品型号或品牌..."
+              @keyup.enter="handleEnterKey"
+          />
         </div>
       </div>
     </div>

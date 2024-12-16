@@ -14,7 +14,17 @@ const routes = [
     {
         path:'/search-results',
         name: 'SearchResults',
-        component: () => import('../views/SearchResult.Vue'), // 懒加载 ProductDetail 组件
+        component: () => import('../views/SearchResult.vue'), // 懒加载 ProductDetail 组件
+    },
+    {
+        path:'/login',
+        name: 'login',
+        component: () => import('@/views/login.vue'), // 懒加载 ProductDetail 组件
+    },
+    {
+        path:'/register',
+        name: 'register',
+        component: () => import('@/views/register.vue'), // 懒加载 ProductDetail 组件
     }
 ];
 
