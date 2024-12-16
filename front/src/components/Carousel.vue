@@ -1,6 +1,7 @@
 <template>
   <div class="carousel">
-    <div class="carousel-inner">
+    <div class="bg" ref="bg"
+    @mouseover="bgOver($refs.bg)" @mousemove="bgMove($refs.bg,$event)" @mouseout="bgOut($refs.bg)" >
       <div v-if="carouselData.length > 0" class="carousel-item-wrapper">
         <transition name="fade">
           <div
@@ -46,6 +47,12 @@ export default {
       ], // 轮播图数据
       currentIndex: 0, // 当前显示的轮播图索引
       timer: null,     // 定时器
+      bgOpt: {
+        px: 0,
+        py: 0,
+        w: 0,
+        h: 0,
+      },
     };
   },
   methods: {
@@ -72,6 +79,35 @@ export default {
     goToLink(url) {
       window.location.href = url;
     },
+    bgOver(dom) {
+      this.bgOpt = {
+        px: dom.offsetLeft,
+        py: dom.offsetTop,
+        w: dom.offsetWidth,
+        h: dom.offsetHeight,
+      };
+    },
+    bgMove(dom, eve) {
+      let bgOpt = this.bgOpt;
+      let X, Y;
+      let mouseX = eve.pageX - bgOpt.px;
+      let mouseY = eve.pageY - bgOpt.py;
+      if (mouseX > bgOpt.w / 2) {
+        X = mouseX - (bgOpt.w / 2);
+      } else {
+        X = mouseX - (bgOpt.w / 2);
+      }
+      if (mouseY > bgOpt.h / 2) {
+        Y = bgOpt.h / 2 - mouseY;
+      } else {
+        Y = bgOpt.h / 2 - mouseY;
+      }
+      dom.style['transform'] = `rotateY(${X / 50}deg) rotateX(${Y / 50}deg)`;
+      dom.style.transform = `rotateY(${X / 50}deg) rotateX(${Y / 50}deg)`;
+    },
+    bgOut(dom) {
+      dom.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    }
   },
   mounted() {
     //this.fetchCarouselData();
@@ -92,7 +128,7 @@ export default {
   overflow: hidden;
 }
 
-.carousel-inner {
+.bg {
   width: 100%;
   height: 100%;
 }

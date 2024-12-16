@@ -1,5 +1,12 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue'; // 引入 @vitejs/plugin-vue
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+
 export default defineConfig({
-    plugins: [vue()], // 添加 vue 插
-});
+    plugins: [vue()],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'), // 配置 @ 指向 src 目录
+        },
+    },
+})

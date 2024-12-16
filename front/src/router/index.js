@@ -11,6 +11,11 @@ const routes = [
         name: 'ProductDetail',
         component: () => import('../views/ProductDetail.vue'), // 懒加载 ProductDetail 组件
     },
+    {
+        path:'/search-results',
+        name: 'SearchResults',
+        component: () => import('../views/SearchResult.Vue'), // 懒加载 ProductDetail 组件
+    }
 ];
 
 const router = createRouter({

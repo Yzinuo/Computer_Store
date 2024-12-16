@@ -1,13 +1,21 @@
 <template>
-  <div id="app">
+
+
+  <div id="app" class="h-full w-full flex flex-col">
+    <!---顶部导航栏-->
+    <Header />
     <!-- 路由视图 -->
     <router-view />
   </div>
 </template>
 
 <script>
+import Header from './components/layout/Header.vue'
 export default {
   name: 'App',
+  components: {
+    Header,
+  },
 };
 </script>
 
