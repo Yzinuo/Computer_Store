@@ -73,12 +73,12 @@ export default {
     handleScroll() {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
       if (scrollTop + clientHeight >= scrollHeight - 100) {
-        this.fetchProducts();
+        // this.fetchProducts();
       }
     },
   },
   mounted() {
-    this.fetchProducts();
+    // this.fetchProducts();
     window.addEventListener('scroll', this.handleScroll);
   },
   beforeUnmount() {

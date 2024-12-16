@@ -1,8 +1,13 @@
 <template>
-  <p>什么原因呢</p>
   <div class="home">
     <Carousel />
     <ProductList />
+    <span class="flex gap-2 text-gray">
+      没有更多商品啦!
+      <button class="flex items-center" @click="backTop">
+        点击回到顶部 <span class="i-mdi:arrow-up-bold-box ml-1 inline-block text-xl" />
+      </button>
+    </span>
   </div>
 </template>
 
