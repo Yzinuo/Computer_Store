@@ -13,7 +13,7 @@ export const useUserStore = defineStore ('user', {
             nickname: '',
             avatar: 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
             email: '',
-            intro: '',
+            bio: '',
         },
         token: null,
     }),
@@ -60,6 +60,18 @@ export const useUserStore = defineStore ('user', {
                 return Promise.reject(error)
             }
         },
-
+        async uploadAvatar(formData) {
+            const response = await api.uploadAvatar(formData);
+            if (response.code === 0) {
+                this.userInfo.avatar = response.data.url;
+                return response.data;
+            }
+        },
+        async updateUserInfo(updatedData) {
+            const response = await api.updateUser(updatedData);
+            if (response.code === 0) {
+                this.userInfo = { ...this.userInfo, ...updatedData };
+            }
+        },
     },
 })

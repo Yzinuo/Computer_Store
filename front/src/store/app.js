@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import api from '@/api'
 
 export const useAppStore = defineStore('app', {
     state: () => ({
@@ -16,13 +16,13 @@ export const useAppStore = defineStore('app', {
         setSearchFlag(flag) { this.searchFlag = flag },
 
 
-        // async getPageList() {
-        //     const resp = await api.getPageList()
-        //     if (resp.code === 0) {
-        //         this.page_list = resp.data
-        //         this.page_list?.forEach(e => (e.cover = convertImgUrl(e.cover)))
-        //     }
-        // },
+        async getPageList() {
+            const resp = await api.getPageList()
+            if (resp.code === 0) {
+                this.page_list = resp.data
+                this.page_list?.forEach(e => (e.cover = convertImgUrl(e.cover)))
+            }
+        },
     },
 })
 

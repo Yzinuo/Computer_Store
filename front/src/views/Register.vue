@@ -8,7 +8,6 @@
           aria-autocomplete="off"
           :model="registerForm"
           ref="registerFormRef"
-          :rules="rules"
           label-width="100px"
           style="transform: translate(-30px)"
       >
@@ -23,7 +22,6 @@
               type="password"
               v-model="registerForm.password"
               placeholder="请输入密码"
-              show-password
           ></el-input>
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
@@ -31,35 +29,9 @@
               type="password"
               v-model="registerForm.confirmPassword"
               placeholder="请确认密码"
-              show-password
           ></el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="code">
-          <el-input
-              style="width: 150px"
-              v-model="registerForm.code"
-              placeholder="请输入验证码"
-              maxlength="6"
-              clearable
-          ></el-input>
-          <el-button
-              round
-              class="code-btn"
-              type="primary"
-              v-if="isTime"
-              @click="getCode(registerForm.email)"
-          >获取验证码</el-button
-          >
-          <el-button
-              round
-              class="code-btn"
-              size="Large"
-              color="#c0c4c3"
-              v-if="!isTime"
-          >{{ currentTime }}后重新获取</el-button
-          >
-        </el-form-item>
-        <el-button class="btn" type="primary" @click="register">注册</el-button>
+        <el-button class="btn" type="primary" @click="handleRegister">注册</el-button>
         <div style="text-align: right; transform: translate(0, 30px)">
           <el-link type="success" @click="goToLogin">已有账号？去登录</el-link>
         </div>
@@ -71,80 +43,64 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { getCodeService, registerService } from "@/api/user";
+import api from "@/api";
 
 const isTime = ref(true);
 const currentTime = ref(10);
-const getCode = async () => {
-  console.log("开始发送验证码");
-  isTime.value = false;
-  currentTime.value = 10;
-  const email = registerForm.value.email;
-  console.log(email);
-  const interval = setInterval(() => {
-    currentTime.value--;
-    if (currentTime.value === 0) {
-      clearInterval(interval);
-      isTime.value = !isTime.value;
-    }
-  }, 1000);
-  try {
-    await getCodeService(email);
-    ElMessage.success("验证码发送成功");
-  } catch (error) {
-    console.error("发送验证码时出现错误：", error);
-  }
-};
+
+
 
 const registerForm = ref({
   email: "",
   password: "",
   confirmPassword: "",
-  code: "",
 });
 
 const registerFormRef = ref({
   email: "",
   password: "",
   confirmPassword: "",
-  code: "",
 });
 
-const rules = {
-  email: [
-    { required: true, message: "请输入邮箱", trigger: "blur" },
-    { type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"] },
-  ],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-  confirmPassword: [
-    { required: true, message: "请确认密码", trigger: "blur" },
-    {
-      validator: (rule, value, callback) => {
-        if (value == "") {
-          callback(new Error("请再次输入密码"));
-        } else if (value !== registerForm.value.password) {
-          callback(new Error("两次密码不一致"));
-        } else {
-          callback();
-        }
-      },
-      trigger: "blur",
-    },
-  ],
-  code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
-};
+
 
 const router = useRouter();
 
-const register = async () => {
-  registerForm.value.email = registerForm.value.email.trim();
-  registerForm.value.password = registerForm.value.password.trim();
-  registerForm.value.code = registerForm.value.code.trim();
-  const res = await registerService(registerForm.value);
-  //ElMessage.success(res.message ? res.message : '注册成功!')
-  ElMessage.success("注册成功!");
-  goToLogin;
-};
+async function handleRegister() {
+  const { email, password, confirmPassword} = registerForm.value
+
+  const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+  if (!reg.test(email)) {
+    window.$message?.warning('请输入正确的邮箱格式')
+    return
+  }
+
+  if (!password) {
+    window.$message?.warning('请输入密码')
+    return
+  }
+
+  if (password !== confirmPassword){
+    window.$message?.warning('两次密码不一致')
+    return
+  }
+  // 发送注册请求
+  try {
+    // Simulated API request
+    await api.registerService({ email, password });
+    window.$message?.success('邮件已发送，请在邮箱中确认以完成注册');
+
+    // Clear the form after success
+    registerForm.value = { email: '', password: '', confirmPassword: '' };
+
+    // Go to the login screen
+    goToLogin();
+  } catch (error) {
+    // Handle any API errors here
+    console.error('Registration failed:', error);
+    window.$message?.error('注册失败，请稍后重试');
+  }
+}
 
 const goToLogin = () => {
   router.push("/login");
@@ -287,15 +243,10 @@ h2 {
 }
 
 .btn {
-  transform: translate(170px);
+  transform: translate(10px);
   width: 80px;
   height: 40px;
   font-size: 15px;
 }
-.code-btn {
-  transform: translate(20px);
-  width: 90px;
-  height: 40px;
-  font-size: 10px;
-}
+
 </style>

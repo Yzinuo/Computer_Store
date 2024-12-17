@@ -31,20 +31,7 @@
 export default {
   data() {
     return {
-      carouselData: [
-        {
-          picUrl: 'https://via.placeholder.com/1200x500?text=Slide1',
-          linkUrl: 'https://example.com/slide1',
-        },
-        {
-          picUrl: 'https://via.placeholder.com/1200x500?text=Slide2',
-          linkUrl: 'https://example.com/slide2',
-        },
-        {
-          picUrl: 'https://via.placeholder.com/1200x500?text=Slide3',
-          linkUrl: 'https://example.com/slide3',
-        },
-      ], // 轮播图数据
+      carouselData: [], // 轮播图数据
       currentIndex: 0, // 当前显示的轮播图索引
       timer: null,     // 定时器
       bgOpt: {
@@ -56,14 +43,14 @@ export default {
     };
   },
   methods: {
-    // async fetchCarouselData() {
-    //   try {
-    //     const response = await this.$axios.get('/api/carousel');
-    //     this.carouselData = response.data;
-    //   } catch (error) {
-    //     console.error('Failed to fetch carousel data:', error);
-    //   }
-    // },
+    async fetchCarouselData() {
+      try {
+        const response = await this.$axios.get('/api/carousel');
+        this.carouselData = response.data;
+      } catch (error) {
+        console.error('Failed to fetch carousel data:', error);
+      }
+    },
     autoPlay() {
       this.currentIndex = (this.currentIndex + 1) % this.carouselData.length;
     },
@@ -110,7 +97,7 @@ export default {
     }
   },
   mounted() {
-    //this.fetchCarouselData();
+    this.fetchCarouselData();
     console.log('Carousel mounted');
     this.startAutoPlay();
   },
@@ -124,7 +111,7 @@ export default {
 .carousel {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 700px;
   overflow: hidden;
 }
 

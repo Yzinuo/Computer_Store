@@ -19,28 +19,7 @@
 export default {
   data() {
     return {
-      products: [ {
-        id: 1,
-        imageUrl: 'https://via.placeholder.com/250x200?text=Product1',
-        name: 'Product 1',
-        description: 'This is the first product',
-        price: 99.99,
-      },
-        {
-          id: 2,
-          imageUrl: 'https://via.placeholder.com/250x200?text=Product2',
-          name: 'Product 2',
-          description: 'This is the second product',
-          price: 199.99,
-        },
-        {
-          id: 3,
-          imageUrl: 'https://via.placeholder.com/250x200?text=Product3',
-          name: 'Product 3',
-          description: 'This is the third product',
-          price: 299.99,
-        },
-      ],
+      products: [],
       page: 1,
       size: 10,
       loading: false,
@@ -48,22 +27,22 @@ export default {
     };
   },
   methods: {
-    // async fetchProducts() {
-    //   if (!this.hasMore || this.loading) return;
-    //   this.loading = true;
-    //   try {
-    //     const response = await this.$axios.get('/api/products', {
-    //       params: { page: this.page, size: this.size },
-    //     });
-    //     this.products = [...this.products, ...response.data.items];
-    //     this.hasMore = response.data.items.length === this.size;
-    //     this.page++;
-    //   } catch (error) {
-    //     console.error('Failed to fetch products:', error);
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // },
+    async fetchProducts() {
+      if (!this.hasMore || this.loading) return;
+      this.loading = true;
+      try {
+        const response = await this.$axios.get('/api/products', {
+          params: { page: this.page, size: this.size },
+        });
+        this.products = [...this.products, ...response.data.items];
+        this.hasMore = response.data.items.length === this.size;
+        this.page++;
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
     goToProductDetail(productId) {
       this.$router.push({
         name: 'ProductDetail',
@@ -73,12 +52,12 @@ export default {
     handleScroll() {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
       if (scrollTop + clientHeight >= scrollHeight - 100) {
-        // this.fetchProducts();
+        this.fetchProducts();
       }
     },
   },
   mounted() {
-    // this.fetchProducts();
+    this.fetchProducts();
     window.addEventListener('scroll', this.handleScroll);
   },
   beforeUnmount() {

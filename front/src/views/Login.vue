@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from 'element-plus';
-import { loginService } from "@/api"; // 假设 loginService 是登录接口
+import  api  from "@/api"; // 假设 loginService 是登录接口
 import { useUserStore } from "@/store/user"; // 使用你的 userStore
 
 const loginForm = ref({
@@ -11,19 +11,7 @@ const loginForm = ref({
 });
 const loginFormRef = ref(null);
 
-const rules = {
-  email: [
-    {required: true, message: "请输入邮箱", trigger: "blur"},
-    {type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"]},
-  ],
-  password: [
-    {
-      required: true,
-      message: "请输入密码",
-      trigger: "blur",
-    },
-  ],
-};
+
 
 const router = useRouter();
 const userStore = useUserStore(); // 使用你的 userStore
@@ -36,7 +24,7 @@ const login = async () => {
 
   console.log("发送请求");
   try {
-    const res = await loginService(loginForm.value); // 调用登录接口
+    const res = await api.loginService(loginForm.value); // 调用登录接口
     if (res && res.data) {
       // 更新用户信息和 token
       userStore.setToken(res.data.token); // 设置 token
@@ -48,13 +36,13 @@ const login = async () => {
         intro: res.data.intro,
       };
 
-      ElMessage.success("登录成功!");
-      router.push("/"); // 跳转到首页
+      window.$message?.success("登录成功!");
+      changeUrl('/'); // 跳转到首页
     } else {
-      ElMessage.error("登录失败，请检查邮箱和密码");
+      window.$message?.error("登录失败，请检查邮箱和密码");
     }
   } catch (error) {
-    ElMessage.error("登录失败，请稍后重试");
+    window.$message?.error("登录失败，请稍后重试");
     console.error(error);
   }
 };
@@ -191,13 +179,6 @@ const options = {
         >登录
         </el-button>
         <div style="text-align: right; transform: translate(0, 30px)">
-          <el-link
-              type="danger"
-              @click="changeUrl('/forget')"
-              style="margin-right: 140px"
-          >
-            忘记密码？
-          </el-link>
 
           <el-link type="warning" @click="changeUrl('/register')">没有账号？去注册</el-link>
         </div>
@@ -254,7 +235,7 @@ h2 {
 }
 
 .btn {
-  transform: translate(170px);
+  transform: translate(10px);
   width: 80px;
   height: 40px;
   font-size: 15px;

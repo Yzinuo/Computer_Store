@@ -25,7 +25,7 @@ function handleEnterKey(event) {
 }
 
 async function handleSearch() {
-  const resp = await api.searchArticles({ keyword: keyword.value })
+  const resp = await api.searchProduct({ keyword: keyword.value })
   // 跳转到搜索结果页面，并传递搜索结果
   router.push({
     path: '/search-results',
