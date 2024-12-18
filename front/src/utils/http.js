@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useAppStore, useUserStore } from '@/store'
 
+
 // 通用请求
 export const baseRequest = axios.create(
     {
@@ -37,6 +38,8 @@ function requestSuccess(config) {
     }
     return config
 }
+
+
 
 /**
  * 请求失败拦截

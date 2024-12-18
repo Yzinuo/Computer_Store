@@ -46,11 +46,20 @@ export default {
     async fetchCarouselData() {
       try {
         const response = await this.$axios.get('/api/carousel');
-        this.carouselData = response.data;
+        if (response.data.code === 0) { // 假设 Code 为 0 表示成功
+          this.carouselData = response.data.data; // 提取 Data 字段
+        } else {
+          console.error('Failed to fetch carousel data:', response.data.Message);
+          // 这里可以根据需要显示错误信息框
+          alert(response.data.Message);
+        }
       } catch (error) {
         console.error('Failed to fetch carousel data:', error);
+        // 这里可以根据需要显示网络错误或其他错误信息
+        alert('Network error or server issue. Please try again later.');
       }
     },
+
     autoPlay() {
       this.currentIndex = (this.currentIndex + 1) % this.carouselData.length;
     },

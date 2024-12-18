@@ -32,13 +32,22 @@ export default {
       this.loading = true;
       try {
         const response = await this.$axios.get('/api/products', {
-          params: { page: this.page, size: this.size },
+          params: { page_num: this.page, page_size: this.size },
         });
-        this.products = [...this.products, ...response.data.items];
-        this.hasMore = response.data.items.length === this.size;
-        this.page++;
+        if (response.data.code === 0) { // 假设 Code 为 0 表示成功
+          const newProducts = response.data.data || []; // 提取 Data 字段中的 items
+          this.products = [...this.products, ...newProducts];
+          this.hasMore = newProducts.length === this.size;
+          this.page++;
+        } else {
+          console.error('Failed to fetch products:', response.data.Message);
+          // 这里可以根据需要显示错误信息框
+          alert(response.data.Message);
+        }
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        // 这里可以根据需要显示网络错误或其他错误信息
+        alert('Network error or server issue. Please try again later.');
       } finally {
         this.loading = false;
       }

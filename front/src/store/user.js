@@ -41,8 +41,8 @@ export const useUserStore = defineStore ('user', {
             }
             try {
                 const resp = await api.getUser()
-                if (resp.code === 0) {
-                    const data = resp.data
+                if (resp.data.code === 0) {
+                    const data = resp.data.data
                     this.userInfo = {
                         id: data.id,
                         nickname: data.nickname,
@@ -69,7 +69,7 @@ export const useUserStore = defineStore ('user', {
         },
         async updateUserInfo(updatedData) {
             const response = await api.updateUser(updatedData);
-            if (response.code === 0) {
+            if (response.data.code === 0) {
                 this.userInfo = { ...this.userInfo, ...updatedData };
             }
         },

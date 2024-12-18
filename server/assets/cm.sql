@@ -81,6 +81,8 @@ CREATE TABLE user (
                       username VARCHAR(255) NOT NULL UNIQUE COMMENT '用户名',
                       password VARCHAR(255) NOT NULL COMMENT '密码（加密存储）',
                       email VARCHAR(255) NOT NULL UNIQUE COMMENT '邮箱',
+                      introduction VARCHAR(255) DEFAULT NULL COMMENT '简介',
+                      avatar VARCHAR(255) DEFAULT NULL COMMENT '头像',
                       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                       updated_at DATETIME DEFAULT NULL COMMENT '更新时间',
                       INDEX idx_username (username),

@@ -18,8 +18,8 @@ export const useAppStore = defineStore('app', {
 
         async getPageList() {
             const resp = await api.getPageList()
-            if (resp.code === 0) {
-                this.page_list = resp.data
+            if (resp.data.code === 0) {
+                this.page_list = resp.data.data
                 this.page_list?.forEach(e => (e.cover = convertImgUrl(e.cover)))
             }
         },

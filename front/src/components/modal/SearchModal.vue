@@ -31,7 +31,7 @@ async function handleSearch() {
     path: '/search-results',
     query: {
       keyword: keyword.value,
-      results: JSON.stringify(resp),
+      results: JSON.stringify(resp.data),
     },
   })
 }

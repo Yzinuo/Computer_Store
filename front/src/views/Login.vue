@@ -29,7 +29,7 @@ const login = async () => {
       // 更新用户信息和 token
       userStore.setToken(res.data.token); // 设置 token
       userStore.userInfo = {
-        id: res.data.id,
+        id: res.dataid,
         nickname: res.data.nickname,
         avatar: res.data.avatar,
         email: res.data.email,

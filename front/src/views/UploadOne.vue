@@ -19,9 +19,9 @@ async function uploadFile(file) {
   formData.append('file', file)
 
   try {
-    const { data } = await api.upload(formData)
-    preview.value = data.url
-    emit('update:preview', data.url)
+    const response = await api.upload(formData)
+    preview.value = response.data.data.url
+    emit('update:preview', response.data.data.url)
   } catch (error) {
     console.error('Failed to upload image:', error)
   }

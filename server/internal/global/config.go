@@ -3,6 +3,9 @@ package global
 import (
 	"fmt"
 	"log"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -90,26 +93,24 @@ func GetConfig() *Config {
 	return Conf
 }
 
-//func ReadConfig(path string) *Config {
-//	v := viper.New()
-//	v.SetConfigFile(path)
-//	v.AutomaticEnv()                                   // 如果配置文件中有环境变量
-//	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // 环境变量中分割符号都是下划线
-//
-//	if err := v.ReadInConfig(); err != nil {
-//		panic("读取配置文件失败" + err.Error())
-//	}
-//	if err := v.Unmarshal(&Conf); err != nil {
-//		panic("unmarsh 解析配置文件失败" + err.Error())
-//	}
-//	log.Println("配置初始化成功:" + path)
-//
-//	return Conf
-//}
+func ReadConfig(path string) *Config {
+	v := viper.New()
+	v.SetConfigFile(path)
+	v.AutomaticEnv()                                   // 如果配置文件中有环境变量
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // 环境变量中分割符号都是下划线
 
-func ReadConfig(path string) {
-	fmt.Printf("-----------")
+	if err := v.ReadInConfig(); err != nil {
+		panic("读取配置文件失败" + err.Error())
+	}
+	if err := v.Unmarshal(&Conf); err != nil {
+		panic("unmarsh 解析配置文件失败" + err.Error())
+	}
+	log.Println("配置初始化成功:" + path)
+
+	return Conf
 }
+
+
 
 func (*Config) DbType() string {
 	if Conf.Server.DbType == "" {
