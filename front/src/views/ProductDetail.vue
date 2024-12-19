@@ -3,14 +3,14 @@
     <!-- Product Details -->
     <el-row :gutter="20" class="main-section">
       <!-- Left Side: Main Image and Thumbnail Gallery -->
-      <el-col :xs="24" :md="12">
+      <el-col :xs="24" :md="12" class="image-gallery-col">
         <div class="image-gallery">
-          <el-image :src="mainImage" alt="Main Product Image" fit="cover" class="main-image" />
+          <img :src="mainImage" alt="Main Product Image" fit="cover" class="main-image" />
         </div>
       </el-col>
 
       <!-- Right Side: Product Details -->
-      <el-col :xs="24" :md="12">
+      <el-col :xs="24" :md="12" class="product-info-col">
         <div class="product-info">
           <h1 class="product-name">{{ product.name }}</h1>
           <p class="product-price">¥{{ product.price }}</p>
@@ -35,7 +35,6 @@
               <span>Graphics Card: {{ productDetails.graphics_card }}</span>
             </li>
           </ul>
-          <el-button type="primary" @click="goToProductDetail(2)">Go to Product 2</el-button>
         </div>
       </el-col>
     </el-row>
@@ -74,15 +73,16 @@ const fetchProductData = async () => {
 
   try {
     // Fetch product data
-    const productRes = await api.getProductRe(productId);
+    const productRes = await api.getProductRe({ id: productId });
     product.value = productRes.data;
-    mainImage.value = productRes.data.image;
+    mainImage.value = productRes.data.imageUrl;
 
     // Fetch product details
-    const detailsRes = await api.getProductDetail(productId);
+    const detailsRes = await api.getProductDetail({ id: productId });
     productDetails.value = detailsRes.data;
 
-    const imagesRes = await api.getProductImages(productId);
+    // Fetch product images
+    const imagesRes = await api.getProductImages({ id: productId });
     introImages.value = imagesRes.data;
   } catch (error) {
     console.error("Error fetching product data:", error);
@@ -112,46 +112,65 @@ onMounted(() => {
 
   .main-section {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* 确保内容从顶部对齐 */
 
-    .image-gallery {
-      .main-image {
-        width: 100%;
-        height: 400px;
-        border-radius: 8px;
-        object-fit: cover;
+    .image-gallery-col {
+      display: flex;
+      justify-content: flex-start; /* 确保图片部分左对齐 */
+      align-items: flex-start; /* 确保图片部分顶部对齐 */
+      flex: 1; /* 确保图片部分占据左侧空间 */
+      max-width: 50%; /* 限制图片部分的最大宽度为 50% */
+
+      .image-gallery {
+        width: 100%; /* 图片宽度占满父容器 */
+
+        .main-image {
+          width: 100%; /* 图片宽度占满父容器 */
+          height: 400px; /* 固定高度 */
+          max-height: 400px; /* 限制最大高度 */
+          border-radius: 8px;
+          object-fit: cover; /* 图片填充方式 */
+        }
       }
-
     }
 
-    .product-info {
-      .product-name {
-        font-size: 1.8rem;
-        font-weight: bold;
-      }
-      .product-price {
-        font-size: 1.5rem;
-        color: #e74c3c;
-        margin: 1rem 0;
-      }
-      .product-description {
-        margin-bottom: 1rem;
-        color: #777;
-      }
-      .configurations {
-        list-style: none;
-        padding: 0;
+    .product-info-col {
+      flex: 1; /* 确保右侧信息部分占据剩余空间 */
+      display: flex;
+      justify-content: flex-start; /* 确保信息部分左对齐 */
+      align-items: flex-start; /* 确保信息部分顶部对齐 */
 
-        li {
-          display: flex;
-          align-items: center;
-          margin-bottom: 0.75rem;
-          font-size: 1rem;
+      .product-info {
+        width: 100%; /* 确保信息部分宽度占满父容器 */
 
-          .icon {
-            margin-right: 10px;
-            color: #409eff;
-            font-size: 1.5rem;
+        .product-name {
+          font-size: 1.8rem;
+          font-weight: bold;
+        }
+        .product-price {
+          font-size: 1.5rem;
+          color: #e74c3c;
+          margin: 1rem 0;
+        }
+        .product-description {
+          margin-bottom: 1rem;
+          color: #777;
+        }
+        .configurations {
+          list-style: none;
+          padding: 0;
+
+          li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+
+            .icon {
+              margin-right: 10px;
+              color: #409eff;
+              font-size: 1.5rem;
+            }
           }
         }
       }
@@ -173,7 +192,7 @@ onMounted(() => {
       img {
         width: 100%; /* 强制设置宽度 */
         height: auto; /* 强制设置高度 */
-        object-fit: cover ; /* 强制设置图片填充方式 */
+        object-fit: cover; /* 强制设置图片填充方式 */
         display: block;
       }
     }

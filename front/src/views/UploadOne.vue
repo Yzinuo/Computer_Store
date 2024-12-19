@@ -20,8 +20,8 @@ async function uploadFile(file) {
 
   try {
     const response = await api.upload(formData)
-    preview.value = response.data.data.url
-    emit('update:preview', response.data.data.url)
+    preview.value = response.data
+    emit('update:preview', response.data)
   } catch (error) {
     console.error('Failed to upload image:', error)
   }

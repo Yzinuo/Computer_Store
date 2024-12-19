@@ -37,12 +37,13 @@ export const useUserStore = defineStore ('user', {
         },
         async getUserInfo() {
             if (!this.token) {
+                console.log(this.token)
                 return
             }
             try {
                 const resp = await api.getUser()
-                if (resp.data.code === 0) {
-                    const data = resp.data.data
+                if (resp.code === 0) {
+                    const data = resp.data
                     this.userInfo = {
                         id: data.id,
                         nickname: data.nickname,
@@ -63,7 +64,7 @@ export const useUserStore = defineStore ('user', {
         async uploadAvatar(formData) {
             const response = await api.uploadAvatar(formData);
             if (response.code === 0) {
-                this.userInfo.avatar = response.data.url;
+                this.userInfo.avatar = response.data;
                 return response.data;
             }
         },

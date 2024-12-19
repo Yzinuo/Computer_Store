@@ -5,21 +5,7 @@ CREATE DATABASE IF NOT EXISTS `c_m` DEFAULT  CHARACTER SET  utf8mb4;
 
 USE c_m;
 
-DROP TABLE IF EXISTS `brand`;
-CREATE TABLE brand (
-                       id INT AUTO_INCREMENT PRIMARY KEY COMMENT '品牌唯一标识',
-                       name VARCHAR(255) NOT NULL UNIQUE COMMENT '品牌名称',
-                       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                       updated_at DATETIME DEFAULT NULL COMMENT '更新时间'
-) COMMENT='品牌表';
 
-DROP TABLE IF EXISTS `category`;
-CREATE TABLE category (
-                          id INT AUTO_INCREMENT PRIMARY KEY COMMENT '分类唯一标识',
-                          name VARCHAR(255) NOT NULL UNIQUE COMMENT '分类名称',
-                          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                          updated_at DATETIME DEFAULT NULL COMMENT '更新时间'
-) COMMENT='分类表';
 
 DROP TABLE IF EXISTS `computer`;
 CREATE TABLE computer (
@@ -28,14 +14,9 @@ CREATE TABLE computer (
                           image      VARCHAR(255) NOT NULL  COMMENT '商品图片',
                           price DECIMAL(10, 2) NOT NULL COMMENT '商品价格',
                           description  VARCHAR(255) NOT NULL  COMMENT '电脑介绍',
-                          brand_id INT NOT NULL COMMENT '品牌ID',
-                          category_id INT NOT NULL COMMENT '分类ID',
                           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                           updated_at DATETIME DEFAULT NULL COMMENT '更新时间',
-                          FOREIGN KEY (brand_id) REFERENCES brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                          FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                          INDEX idx_brand_id (brand_id),
-                          INDEX idx_category_id (category_id)
+                        
 ) COMMENT='商品表';
 
 DROP TABLE IF EXISTS `product_detail`;
@@ -89,49 +70,39 @@ CREATE TABLE user (
                       INDEX idx_email (email)
 ) COMMENT='用户表';
 
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE role (
-                      id INT AUTO_INCREMENT PRIMARY KEY COMMENT '角色唯一标识',
-                      name VARCHAR(255) NOT NULL UNIQUE COMMENT '角色名称',
-                      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                      updated_at DATETIME DEFAULT NULL COMMENT '更新时间',
-                      INDEX idx_name (name)
-) COMMENT='角色表';
+INSERT INTO computer (name, image, price, description, created_at, updated_at)
+VALUES
+('Dell XPS 13', 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Carousel2.jpg', 999.99, '13-inch ultrabook with a high-resolution display', NOW(), NOW()),
+('Apple MacBook Pro 16"', 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Carousel2.jpg', 2499.99, '16-inch laptop with an M1 Pro chip', NOW(), NOW()),
+('HP Spectre x360', 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/HP.jpg', 1349.99, '2-in-1 convertible laptop with a touchscreen', NOW(), NOW()),
+('Lenovo ThinkPad X1 Carbon', 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Carousel1.jpg', 1899.99, 'Ultra-lightweight business laptop', NOW(), NOW());
 
-DROP TABLE IF EXISTS `permission`;
-CREATE TABLE permission (
-                            id INT AUTO_INCREMENT PRIMARY KEY COMMENT '权限唯一标识',
-                            name VARCHAR(255) NOT NULL UNIQUE COMMENT '权限名称',
-                            url VARCHAR(255) NOT NULL COMMENT '资源名称（如 product, order）',
-                            method VARCHAR(255) NOT NULL COMMENT '操作名称（如 GET,POST）',
-                            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            updated_at DATETIME DEFAULT NULL COMMENT '更新时间',
-                            INDEX idx_name (name)
-) COMMENT='权限表';
+-- 插入 product_detail 表的数据
+INSERT INTO product_detail (product_id, processor, stock, memory, hard_disk, graphics_card, created_at, updated_at)
+VALUES
+(1, 'Intel Core i7', 100, '16GB RAM', '512GB SSD', 'Intel Iris Xe', NOW(), NOW()),
+(2, 'Apple M1 Pro', 50, '32GB RAM', '1TB SSD', 'Integrated GPU', NOW(), NOW()),
+(3, 'Intel Core i5', 150, '8GB RAM', '256GB SSD', 'Intel UHD Graphics', NOW(), NOW()),
+(4, 'Intel Core i7', 75, '16GB RAM', '512GB SSD', 'Intel Iris Xe', NOW(), NOW());
 
-DROP TABLE IF EXISTS `user_role`;
-CREATE TABLE user_role (
-                           id INT AUTO_INCREMENT PRIMARY KEY COMMENT '关联唯一标识',
-                           user_id INT NOT NULL COMMENT '用户ID',
-                           role_id INT NOT NULL COMMENT '角色ID',
-                           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                           FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                           FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                           INDEX idx_user_id (user_id),
-                           INDEX idx_role_id (role_id)
-) COMMENT='用户角色关联表';
+-- 插入 product_image 表的数据
+INSERT INTO product_image (product_id, image_url, description, created_at, updated_at)
+VALUES
+(1, 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/DELL_image.jpg', 'Front view of Dell XPS 13', NOW(), NOW()),
+(2, 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Apple_image.jpg', 'Apple MacBook Pro 16" from the back', NOW(), NOW()),
+(3, 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/hp_image.jpg', 'HP Spectre x360 laptop mode', NOW(), NOW()),
+(4, 'https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/levno_image.jpg', 'Close-up of ThinkPad X1 keyboard', NOW(), NOW());
 
-DROP TABLE IF EXISTS `role_permission`;
-CREATE TABLE role_permission (
-                                 id INT AUTO_INCREMENT PRIMARY KEY COMMENT '关联唯一标识',
-                                 role_id INT NOT NULL COMMENT '角色ID',
-                                 permission_id INT NOT NULL COMMENT '权限ID',
-                                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                                 FOREIGN KEY (permission_id) REFERENCES permission(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                                 INDEX idx_role_id (role_id),
-                                 INDEX idx_permission_id (permission_id)
-) COMMENT='角色权限关联表';
+-- 插入 carousel 表的数据
+INSERT INTO carousel (image_url, link_url, is_active, `order`, created_at, updated_at)
+VALUES
+('https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Carousel2.jpg', 'localhost:5173/product/1', 1, 1, NOW(), NOW()),
+('https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/Carousel2.jpg', 'localhost:5173/product/2', 1, 2, NOW(), NOW()),
+('https://gvbresource.oss-cn-hongkong.aliyuncs.com/computer_image/HP.jpg', 'localhost:5173/product/3', 1, 3, NOW(), NOW());
 
+-- 插入 user 表的数据
+INSERT INTO user (username, password, email, introduction, avatar, created_at, updated_at)
+VALUES
+('john_doe', '$2a$10$FmU4jxwDlibSL9pdt.AsuODkbB4gLp3IyyXeoMmW/XALtT/HdwTsi', 'test@qq.com', 'Tech enthusiast', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS  = 1;

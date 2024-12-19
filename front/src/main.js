@@ -6,6 +6,11 @@ import axios from 'axios'; // 引入 axios
 import 'uno.css';
 import ElementPlus from 'element-plus'
 import Particles from 'particles.vue3'
+// custom style
+import './styles/index.css'
+import './styles/common.css'
+import './styles/animate.css'
+
 
 const app = createApp(App);
 app.use(ElementPlus )

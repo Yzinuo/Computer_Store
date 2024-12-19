@@ -10,6 +10,8 @@ import (
 	"computer_store/internal/utils"
 	"computer_store/internal/utils/jwt"
 
+	"computer_store/internal/model"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -23,14 +25,14 @@ type Loginreq struct {
 }
 
 type LoginVO struct {
-	model.UserInfo
-	Token string  `json:"token"`
+	model.User
+	Token string `json:"token"`
 }
 type Registereq struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
-type UpdateUserReq struct{
+type UpdateUserReq struct {
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
 	Avatar   string `json:"avatar"`
@@ -44,124 +46,123 @@ func (*User) Login(c *gin.Context) {
 		return
 	}
 
-	auth,err := model.GetUserInfo(GetDB(c),loginreq.Email) // 获取用户所有信息
-	if err != nil{
-		if errors.Is(err,gorm.ErrRecordNotFound) {
+	auth, err := model.GetUserInfoByEmail(GetDB(c), loginreq.Email) // 获取用户所有信息
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ReturnError(c, g.ErrUserNotExist, err)
 			return
 		}
-		ReturnError(c,g.ErrDbOp,err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
-	
-	if !utils.BcryptCheck(loginreq.Password,auth.Password) {
-		ReturnError(c,g.ErrPassword,err)
+
+	if !utils.BcryptCheck(loginreq.Password, auth.Password) {
+		ReturnError(c, g.ErrPassword, err)
 		return
 	}
-	
+
 	conf := g.Conf.JWT
-	token,err  := jwt.GenToken(conf.Secret,conf.Issuer,int(conf.Expire),auth.ID)
-	if err != nil{
-		ReturnError(c,g.ErrTokenCreate,err)
+	token, err := jwt.GenToken(conf.Secret, conf.Issuer, int(conf.Expire), auth.ID)
+	if err != nil {
+		ReturnError(c, g.ErrTokenCreate, err)
 		return
 	}
-	
+
 	slog.Info("用户登录成功") //保存登录状态10分钟
 	session := sessions.Default(c)
-	session.Set(g.CTX_USER_AUTH,auth.ID)
+	session.Set(g.CTX_USER_AUTH, auth.ID)
 	session.Save()
 
 	ReturnSuccess(c, LoginVO{
-		UserInfo: auth,
+		User:  *auth,
 		Token: token,
 	})
 }
 
 func (*User) Logout(c *gin.Context) {
-	c.Set(g.CTX_USER_AUTH,nil)
+	c.Set(g.CTX_USER_AUTH, nil)
 
 	session := sessions.Default(c)
 	session.Delete(g.CTX_USER_AUTH)
 	session.Save()
 
-	ReturnSuccess(c,nil)
+	ReturnSuccess(c, nil)
 }
 
 func (*User) Register(c *gin.Context) {
 	var regreq Registereq
 	if err := c.ShouldBindJSON(&regreq); err != nil {
-		ReturnError(c,g.ErrRequest,err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 	regreq.Email = utils.Format(regreq.Email)
 
 	// 检查用户名是否存在，避免重复注册
-	auth,err := model.GetUserAuthInfoByName(GetDB(c),regreq.Email)
+	auth, err := model.GetUserInfoByEmail(GetDB(c), regreq.Email)
 	if err != nil {
 		var flag bool = false
-		if errors.Is(err,gorm.ErrRecordNotFound) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			flag = true
 		}
-		if !flag{
-			ReturnError(c,g.ErrDbOp,err)
+		if !flag {
+			ReturnError(c, g.ErrDbOp, err)
 			return
 		}
 	}
 
 	if auth != nil {
-		ReturnError(c,g.ErrUserExist,err)
+		ReturnError(c, g.ErrUserExist, err)
 		return
 	}
-	
 
 	// 通过邮箱验证
-	info := utils.GenEmailVerificationInfo(regreq.Email,regreq.Password)
-	SetMailInfo(GetRDB(c),info,15*time.Minute) // 15分钟过期
-	EmailData := utils.GetEmailData(regreq.Email,info)
-	err = utils.SendEmail(regreq.Email,EmailData)
+	info := utils.GenEmailVerificationInfo(regreq.Email, regreq.Password)
+	SetMailInfo(GetRDB(c), info, 15*time.Minute) // 15分钟过期
+	EmailData := utils.GetEmailData(regreq.Email, info)
+	err = utils.SendEmail(regreq.Email, EmailData)
 	if err != nil {
-		ReturnError(c,g.ErrSendEmail,err)
+		ReturnError(c, g.ErrSendEmail, err)
 		return
 	}
 
-	ReturnSuccess(c,nil)
+	ReturnSuccess(c, nil)
 }
 
 func (*User) VerifyCode(c *gin.Context) {
-    var code string
-    if code = c.Query("info"); code == "" {
-        returnErrorPage(c)
-        return
-    }
+	var code string
+	if code = c.Query("info"); code == "" {
+		returnErrorPage(c)
+		return
+	}
 
-    // 验证是否有code在数据库中
-    ifExist, err := GetMailInfo(GetRDB(c), code)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
-    if !ifExist {
-        returnErrorPage(c)
-        return
-    }
+	// 验证是否有code在数据库中
+	ifExist, err := GetMailInfo(GetRDB(c), code)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
+	if !ifExist {
+		returnErrorPage(c)
+		return
+	}
 
-    DeleteMailInfo(GetRDB(c), code)
+	DeleteMailInfo(GetRDB(c), code)
 
-    username, password, err := utils.ParseEmailVerificationInfo(code)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
+	username, password, err := utils.ParseEmailVerificationInfo(code)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
 
-    // 注册用户
-      _,_,_,err = model.CreateNewUser(GetDB(c), username, password)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
+	// 注册用户
+	err = model.CreateNewUser(GetDB(c), username, password)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
 
-    // 注册成功，返回成功页面
-    c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`
+	// 注册成功，返回成功页面
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`
         <!DOCTYPE html>
         <html lang="zh-CN">
         <head>
@@ -204,7 +205,7 @@ func (*User) VerifyCode(c *gin.Context) {
 }
 
 func returnErrorPage(c *gin.Context) {
-    c.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(`
+	c.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(`
         <!DOCTYPE html>
         <html lang="zh-CN">
         <head>
@@ -246,35 +247,33 @@ func returnErrorPage(c *gin.Context) {
     `))
 }
 
-
-func (*User) GetUserInfo(c *gin.Context){
-	userinfo,err := CurrentUserAuth(c)
+func (*User) GetUserInfo(c *gin.Context) {
+	userinfo, err := CurrentUserAuth(c)
 	if err != nil {
-		ReturnError(c,g.ErrTokenNotExist,err)
+		ReturnError(c, g.ErrTokenNotExist, err)
 		return
 	}
 
-	ReturnSuccess(c,userinfo)	
+	ReturnSuccess(c, userinfo)
 }
 
-func (*User) UpdateUserReq(c *gin.Context){
+func (*User) UpdateUserInfo(c *gin.Context) {
 	var req UpdateUserReq
-	if err := c.ShouldBindJSON(&req); err!= nil {
-		ReturnError(c,g.ErrRequest,err)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
-	auth,err := CurrentUserAuth(c)
-	if err!= nil {
-		ReturnError(c,g.ErrTokenNotExist,err)
+	auth, err := CurrentUserAuth(c)
+	if err != nil {
+		ReturnError(c, g.ErrTokenNotExist, err)
 		return
 	}
 
-	err = model.UpdateUserInfo(GetDB(c),auth.Id,req.Nickname,req.Email,req.Avatar,req.Intro)
-	if err!= nil {
-		ReturnError(c,g.ErrDbOp,err)
+	userinfo,err := model.UpdateUserInfo(GetDB(c), auth.ID, req.Nickname, req.Email, req.Avatar, req.Intro)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
-	ReturnSuccess(c,nil)
+	ReturnSuccess(c, userinfo)
 }
-

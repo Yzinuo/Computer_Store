@@ -27,9 +27,11 @@ const login = async () => {
     const res = await api.loginService(loginForm.value); // 调用登录接口
     if (res && res.data) {
       // 更新用户信息和 token
+      localStorage.setItem('token', res.data.token);
       userStore.setToken(res.data.token); // 设置 token
+      console.log(userStore.token);
       userStore.userInfo = {
-        id: res.dataid,
+        id: res.data.id,
         nickname: res.data.nickname,
         avatar: res.data.avatar,
         email: res.data.email,
@@ -149,7 +151,6 @@ const options = {
       <el-form
           :model="loginForm"
           ref="loginFormRef"
-          :rules="rules"
           label-width="100px"
           style="transform: translate(-30px)"
       >
@@ -157,7 +158,6 @@ const options = {
           <el-input
               v-model="loginForm.email"
               placeholder="请输入邮箱"
-              clearable
           ></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
@@ -165,8 +165,7 @@ const options = {
               type="password"
               v-model="loginForm.password"
               placeholder="请输入密码"
-              show-password
-              clearable
+
           ></el-input>
         </el-form-item>
 

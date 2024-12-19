@@ -28,7 +28,6 @@ const userStore = useUserStore()
 
 onMounted(() => {
   // appStore.getPageList()
-
   userStore.getUserInfo()
 
   // 挂载全局提示

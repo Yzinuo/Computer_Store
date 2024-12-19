@@ -45,7 +45,7 @@ export default {
   methods: {
     async fetchCarouselData() {
       try {
-        const response = await this.$axios.get('/api/carousel');
+        const response = await this.$axios.get('/api/front/carousel');
         if (response.data.code === 0) { // 假设 Code 为 0 表示成功
           this.carouselData = response.data.data; // 提取 Data 字段
         } else {

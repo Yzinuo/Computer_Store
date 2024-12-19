@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	g "computer_store/internal/global"
+	"computer_store/internal/model"
 )
 
 type Front struct{}
@@ -23,7 +24,7 @@ func (*Front) GetCarouselList(c *gin.Context) {
 		 return
 	}
 
-	data,err  = model.GetCarousel()
+	data,err  = model.GetCarousel(GetDB(c))
 	if err != nil{
 		ReturnError(c,g.ErrDbOp,err)
 		return

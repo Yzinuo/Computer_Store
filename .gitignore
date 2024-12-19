@@ -1,0 +1,12 @@
+node_modules/
+
+# 忽略编译输出目录
+dist/
+build/
+
+# 忽略 IDE 配置文件
+.vscode/
+.idea/
+
+package-lock.json
+yarn.lock

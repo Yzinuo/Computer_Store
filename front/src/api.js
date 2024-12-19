@@ -8,9 +8,9 @@ export default {
 
     loginService:(data) => baseRequest.post('/login', data),
     registerService:(data) => baseRequest.post('/register', data),
-    logout:()=> baseRequest.post('/logout'),
+    logout:()=> baseRequest.get('/logout'),
 
-    searchProduct: (params={}) => baseRequest.get('/products',  { params }),
+    searchProduct: (params={}) => baseRequest.get('/front/products',  { params }),
     getPageList: (data) => baseRequest.get('/page-list', data),
     getProductRe: (params={}) => baseRequest.get(`/product`,{ params } ),
     getProductDetail: (params={}) => baseRequest.get(`/product-details`,{ params }),

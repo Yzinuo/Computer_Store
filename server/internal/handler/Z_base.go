@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
+	"computer_store/internal/model"
 )
 
 type Response[T any] struct {
@@ -84,11 +85,11 @@ func GetRDB(c *gin.Context) *redis.Client{
 // 1. 从Context中获取UserInfo，如果获取到说明context中已经保存了
 // 2. 从Session中获取UserInfo Uid(通过解析token获取)
 // 3. 根据id从数据库中获取  然后在设置在gin context中
-func CurrentUserAuth(c *gin.Context)(*model.UserInfo,error){
+func CurrentUserAuth(c *gin.Context)(*model.User,error){
 	var key string = g.CTX_USER_AUTH
 	if cache,exit := c.Get(key);exit && cache != nil {
 		slog.Debug("[FUNC-GET-USER-AUTH]: 从gin context中获取")
-		return cache.(*model.UserInfo),nil
+		return cache.(*model.User),nil
 	}
 
 	//2.
@@ -98,7 +99,7 @@ func CurrentUserAuth(c *gin.Context)(*model.UserInfo,error){
 	// 3.
 	if id != nil{
 		db := GetDB(c)
-		userinfo,err := model.GetUserInfo(db,id.(int))
+		userinfo,err := model.GetUserInfoById(db,id.(int))
 
 		if err!= nil {
 			return nil,err

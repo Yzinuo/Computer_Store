@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
-
+	"computer_store/internal/model"
 	g "computer_store/internal/global"
 
 	"github.com/redis/go-redis/v9"
@@ -13,7 +13,7 @@ import (
 
 var rdbctx = context.Background()
 
-func AddCarouselCache(rdb *redis.Client,carousel []model.Carousel) error {
+func AddCarouselCache(rdb *redis.Client,carousel []model.CarouselVO) error {
 	data,err := json.Marshal(carousel)
 	if err !=nil {return errors.New("序列化失败")}
 
@@ -22,7 +22,7 @@ func AddCarouselCache(rdb *redis.Client,carousel []model.Carousel) error {
 
 
 
-func GetCarouselCache(rdb *redis.Client)(cache []model.Carousel,err error) {
+func GetCarouselCache(rdb *redis.Client)(cache []model.CarouselVO,err error) {
 	val,err := rdb.Get(rdbctx,g.CAROUSEL).Result()
 	if err != nil {return nil,err}
 	

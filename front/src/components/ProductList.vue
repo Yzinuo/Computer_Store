@@ -31,7 +31,7 @@ export default {
       if (!this.hasMore || this.loading) return;
       this.loading = true;
       try {
-        const response = await this.$axios.get('/api/products', {
+        const response = await this.$axios.get('/api/front/products', {
           params: { page_num: this.page, page_size: this.size },
         });
         if (response.data.code === 0) { // 假设 Code 为 0 表示成功

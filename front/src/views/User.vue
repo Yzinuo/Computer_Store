@@ -61,6 +61,7 @@ watch(
 </script>
 
 <template>
+  <div class="bg-container">
   <ElCard shadow="hover" class="max-w-screen-md mx-auto my-10 rounded-lg border">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">个人中心</h2>
 
@@ -86,8 +87,6 @@ watch(
             <ElInput
                 v-model="form.intro"
                 placeholder="请输入简介"
-                type="textarea"
-                rows="3"
                 size="large"
                 class="custom-input"
             />
@@ -116,12 +115,22 @@ watch(
         </div>
       </ElCol>
     </ElRow>
-  </ElCard>
+  </ElCard></div>
 </template>
 
 <style scoped>
 .custom-input {
   width: 100%;
+
+}
+.bg-container {
+  background-image: url('https://gvbresource.oss-cn-hongkong.aliyuncs.com/home.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
 }
 
 .custom-button {
